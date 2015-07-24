@@ -1,2 +1,2 @@
-# webgl assignment2
-Tested with Firefox and Chrome.
+# WebGL assignment2: Painting with the Mouse
+Tested with Firefox and Chrome on Linux.
