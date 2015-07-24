@@ -3,6 +3,52 @@ body {
 }
 
 #gl-canvas {
-   border: 1px black solid;
-   padding: 0px;
+    border: 1px black solid;
+    padding: 0px;
+}
+
+#control {
+    margin-top: 20px;
+    width: 1024px;
+}
+
+#heading {
+    width: 1024px;
+    text-align: center;
+}
+
+label {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 150px;
+}
+
+input {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0px;
+}
+
+#disp-linewidth {
+    border: 1px black solid;
+    display: inline-block;
+    width: 30px;
+    background: #c0c0d0;
+    text-align: center;
+}
+
+button {
+    vertical-align: middle;
+}
+
+#btn-undo {
+    float:left;
+}
+
+#btn-clear {
+    float:right;
+}
+
+#color-picker {
+    width: 100px;
 }

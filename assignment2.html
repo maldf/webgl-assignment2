@@ -37,18 +37,25 @@ main()
 </head>   
 
 <body>
-<canvas id="gl-canvas" width="1024" height="512">
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
+    <div>
+        <h4 id="heading">WebGL Assignment 2: Painting with the Mouse</h4>
+    </div>
 
-<br>
-<div id="mx">0</div>
-<div id="my">0</div>
-<div id="mb">0</div>
+    <canvas id="gl-canvas" width="1024" height="512">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
 
-<div>
-    <input id="color-picker" type="color" value="#0000ff">
-</div>
+    <div id="control">
+        <label for "color-picket">Color</label>
+        <input id="color-picker" type="color" value="#0000ff">
+
+        <label for="sel-linewidth">Line width</label>
+        <input id="sel-linewidth" type="range" min=1 max=10 value=1 step=1">
+        <span id="disp-linewidth">1</span>
+
+        <button id="btn-undo">Undo</button>
+        <button id="btn-clear">Clear</button>
+    </div>
 
 </body>
 </html>
