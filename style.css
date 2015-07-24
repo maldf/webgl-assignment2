@@ -1,0 +1,8 @@
+body {
+    background: #f0f4f0;
+}
+
+#gl-canvas {
+   border: 1px black solid;
+   padding: 0px;
+}
