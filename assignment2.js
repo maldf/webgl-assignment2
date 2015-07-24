@@ -41,7 +41,6 @@ window.onload = function init()
 
     //  Configure WebGL
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.9, 0.9, 0.9, 1.0);
 
     //  Load shaders and initialize attribute buffers
 
@@ -63,11 +62,21 @@ window.onload = function init()
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 6 * 4, 2 * 4);
     gl.enableVertexAttribArray(vColor);
 
-    // handle color picket
+    // handle color pickers
+    // line color
     document.getElementById("color-picker").value = "#2050ff";      // default
     lineColor = convert_string_to_rgb(document.getElementById("color-picker").value);
     document.getElementById("color-picker").oninput = function() {
         lineColor = convert_string_to_rgb(this.value);
+    }
+    // canvas color
+    document.getElementById("color-picker-canvas").value = "#e0e0e0";   // default
+    var cc = convert_string_to_rgb(document.getElementById("color-picker-canvas").value);
+    gl.clearColor(cc[0], cc[1], cc[2], 1.0);
+    document.getElementById("color-picker-canvas").oninput = function() {
+        var cc = convert_string_to_rgb(document.getElementById("color-picker-canvas").value);
+        gl.clearColor(cc[0], cc[1], cc[2], 1.0);
+        render();
     }
    
     // catch mouse down in canvas, catch other mouse events in whole window
@@ -84,8 +93,8 @@ window.onload = function init()
 
     // handle undo
     document.getElementById("btn-undo").onclick = function() {
-        if (lines.length) {
-            var line = lines.pop();
+        var line = lines.pop();
+        if (line) {
             index = line.start;
         }
         render();

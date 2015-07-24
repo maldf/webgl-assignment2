@@ -20,7 +20,7 @@ body {
 label {
     display: inline-block;
     vertical-align: middle;
-    margin-left: 150px;
+    margin-left: 75px;
 }
 
 input {
@@ -49,6 +49,6 @@ button {
     float:right;
 }
 
-#color-picker {
-    width: 100px;
+#color-picker, #color-picker-canvas {
+    width: 50px;
 }
