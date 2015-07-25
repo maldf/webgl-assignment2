@@ -4,26 +4,26 @@ var canvas;
 var gl;
 var vBuffer;
 
-var mouse_btn = false;      // state of mouse button
-var index = 0;              // index into ARRAY_BUFFER on GPU
+var mouse_btn = false;              // state of mouse button
+var index = 0;                      // index into ARRAY_BUFFER on GPU
 
 function Point(x, y) {
     this.x = x;
     this.y = y;
 }
-var lineColor = vec4(0, 0, 1, 1);
-var lineWidth = 1;
+var lineColor = vec4(0, 0, 1, 1);   // current line color selected
+var lineWidth = 1;                  // current line width selected
 
 // store metadata about each line 
-function Poly(start, end, width) {
-    this.start = start;     // start index in ARRAY_BUFFER
-    this.end = end;         // end index in ARRAY_BUFFER
-    this.width = width;     // line width
+function Poly(start, count, width) {
+    this.start = start;             // start index in ARRAY_BUFFER
+    this.count = count;             // number of line segments in polygon
+    this.width = width;             // line width
     // color is send down with each vertex
 }
-var lines = [];
+var lines = [];                     // all lines drawn on canvas
 
-const NUMPOINTS = 100000;   // for 2.4MB buffer (point size = POINT_DATE_SIZE)
+const NUMPOINTS = 100000;           // for 2.4MB buffer (point size = POINT_DATE_SIZE)
 
 // sizeof(point(vec2) +  color(vec4)) = 24 bytes of data
 const POINT_DATA_SIZE = 24;
@@ -43,7 +43,6 @@ window.onload = function init()
     gl.viewport(0, 0, canvas.width, canvas.height);
 
     //  Load shaders and initialize attribute buffers
-
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
@@ -64,7 +63,7 @@ window.onload = function init()
 
     // handle color pickers
     // line color
-    document.getElementById("color-picker").value = "#2050ff";      // default
+    document.getElementById("color-picker").value = "#2050ff";          // default
     lineColor = convert_string_to_rgb(document.getElementById("color-picker").value);
     document.getElementById("color-picker").oninput = function() {
         lineColor = convert_string_to_rgb(this.value);
@@ -74,7 +73,7 @@ window.onload = function init()
     var cc = convert_string_to_rgb(document.getElementById("color-picker-canvas").value);
     gl.clearColor(cc[0], cc[1], cc[2], 1.0);
     document.getElementById("color-picker-canvas").oninput = function() {
-        var cc = convert_string_to_rgb(document.getElementById("color-picker-canvas").value);
+        var cc = convert_string_to_rgb(this.value);
         gl.clearColor(cc[0], cc[1], cc[2], 1.0);
         render();
     }
@@ -85,7 +84,7 @@ window.onload = function init()
     canvas.addEventListener("mousedown", mouse_down);
   
     // handle line width selector
-    document.getElementById("sel-linewidth").value = 1;
+    document.getElementById("sel-linewidth").value = 1;     // default
     document.getElementById("sel-linewidth").oninput = function() {
         lineWidth = this.value;
         document.getElementById("disp-linewidth").innerHTML = lineWidth;
@@ -145,6 +144,7 @@ function add_point(ev)
 {
     if (index < NUMPOINTS) {
         var pos = mouse_to_canvas_coords(ev);
+        // each point is a position(vec2) and a color(vec4)
         var p = vec2(pos.x, pos.y).concat(lineColor);
         gl.bufferSubData(gl.ARRAY_BUFFER, POINT_DATA_SIZE * index, flatten(p));
         index++;
@@ -161,7 +161,7 @@ function mouse_move(ev)
     if (mouse_btn) {
         // send next point and its color to GPU 
         if (add_point(ev)) {
-            lines[lines.length - 1].end = index - 1;
+            lines[lines.length - 1].count++;
             render();
         }
     }
@@ -181,7 +181,7 @@ function mouse_down(ev)
     // start new line segment,
     // send 1st point and its color to GPU
     if (add_point(ev)) {
-        lines.push(new Poly(index - 1, -1, lineWidth));
+        lines.push(new Poly(index - 1, 0, lineWidth));
         mouse_btn = true;
     }
 }
@@ -191,8 +191,8 @@ function render()
 {
     gl.clear(gl.COLOR_BUFFER_BIT);
     // draw all lines stored in the "lines" array
-    for (var i = 0; i < (lines.length) && (lines[i].end != -1); ++i) {
+    for (var i = 0; (i < lines.length) && (lines[i].count > 0); ++i) {
         gl.lineWidth(lines[i].width);
-        gl.drawArrays(gl.LINE_STRIP, lines[i].start, lines[i].end - lines[i].start);
+        gl.drawArrays(gl.LINE_STRIP, lines[i].start, lines[i].count);
     }
 }
