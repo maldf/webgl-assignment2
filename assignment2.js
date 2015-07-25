@@ -23,7 +23,7 @@ function Poly(start, end, width) {
 }
 var lines = [];
 
-const NUMPOINTS = 200000;
+const NUMPOINTS = 100000;   // for 2.4MB buffer (point size = POINT_DATE_SIZE)
 
 // sizeof(point(vec2) +  color(vec4)) = 24 bytes of data
 const POINT_DATA_SIZE = 24;
@@ -97,6 +97,7 @@ window.onload = function init()
         if (line) {
             index = line.start;
         }
+        document.getElementById("status").innerHTML = "";
         render();
     }
     
@@ -104,6 +105,7 @@ window.onload = function init()
     document.getElementById("btn-clear").onclick = function() {
         lines = [];
         index = 0;
+        document.getElementById("status").innerHTML = "";
         render();
     }
     
@@ -125,7 +127,6 @@ function convert_string_to_rgb(str) {
     return color;
 }
 
-
 //-------------------------------------------------------------------------------------------------
 // get mouse position and convert to clip coordinates
 function mouse_to_canvas_coords(ev)
@@ -140,16 +141,29 @@ function mouse_to_canvas_coords(ev)
 }
 
 //-------------------------------------------------------------------------------------------------
+function add_point(ev)
+{
+    if (index < NUMPOINTS) {
+        var pos = mouse_to_canvas_coords(ev);
+        var p = vec2(pos.x, pos.y).concat(lineColor);
+        gl.bufferSubData(gl.ARRAY_BUFFER, POINT_DATA_SIZE * index, flatten(p));
+        index++;
+        return true;
+    } else {
+        document.getElementById("status").innerHTML = NUMPOINTS + " point limit reached";
+        return false;
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
 function mouse_move(ev)
 {
     if (mouse_btn) {
         // send next point and its color to GPU 
-        var pos = mouse_to_canvas_coords(ev);
-        var p = vec2(pos.x, pos.y).concat(lineColor);
-        gl.bufferSubData(gl.ARRAY_BUFFER, POINT_DATA_SIZE * index, flatten(p));
-        lines[lines.length - 1].end = index;
-        index++;
-        render();
+        if (add_point(ev)) {
+            lines[lines.length - 1].end = index - 1;
+            render();
+        }
     }
 }
 
@@ -166,12 +180,10 @@ function mouse_down(ev)
 {
     // start new line segment,
     // send 1st point and its color to GPU
-    var pos = mouse_to_canvas_coords(ev);
-    var p = vec2(pos.x, pos.y).concat(lineColor);
-    gl.bufferSubData(gl.ARRAY_BUFFER, POINT_DATA_SIZE * index, flatten(p));
-    lines.push(new Poly(index, -1, lineWidth));
-    index++;
-    mouse_btn = true;
+    if (add_point(ev)) {
+        lines.push(new Poly(index - 1, -1, lineWidth));
+        mouse_btn = true;
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

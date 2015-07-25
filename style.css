@@ -52,3 +52,14 @@ button {
 #color-picker, #color-picker-canvas {
     width: 50px;
 }
+
+#footer {
+    position: fixed;
+    bottom: 0;
+    font-size: 0.8em;
+}
+
+#footer > #status {
+    color: #f02020;
+    padding-left: 10em;
+}
